@@ -637,19 +637,14 @@
 
             return `${specialContext}Find 2-3 relevant passages from LOTR: "${queryInput}"${filterHints}
 
-For each passage:
-1. Text
-2. Book/chapter
-3. Why it's relevant
-
-Format as JSON:
+Return a valid JSON object with this exact structure. Escape all quotes in strings with backslash.
 {
   "passages": [
-    {"text": "passage", "source": "Book, Chapter", "relevance": "why"}
+    {"text": "exact passage quote", "source": "Book Name, Chapter Number", "relevance": "brief explanation"}
   ]
 }
 
-Return ONLY JSON.`;
+Return ONLY the JSON, no other text.`;
         }
 
         async function findPassages() {
@@ -682,7 +677,16 @@ Return ONLY JSON.`;
                 }
 
                 const cleanJson = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-                const parsed = JSON.parse(cleanJson);
+                
+                let parsed;
+                try {
+                    parsed = JSON.parse(cleanJson);
+                } catch (parseErr) {
+                    console.error('JSON parse error:', parseErr);
+                    console.error('Raw response:', cleanJson);
+                    showError('Failed to parse response. Please try again.');
+                    return;
+                }
 
                 if (!parsed.passages?.length) {
                     showError('No passages found');
