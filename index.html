@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOTR Passage Finder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --text-primary: #2c2c2a;
+            --text-secondary: #5f5e5a;
+            --text-muted: #888780;
+            --surface-0: #f1efe8;
+            --surface-1: #ede9e0;
+            --surface-2: #ffffff;
+            --border: rgba(0, 0, 0, 0.08);
+            --border-strong: rgba(0, 0, 0, 0.15);
+            --bg-danger: #fcebeb;
+            --text-danger: #a32d2d;
+            --bg-success: #eaf3de;
+            --text-success: #3b6d11;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f0ede6;
+                --text-secondary: #a09d94;
+                --text-muted: #6d6c68;
+                --surface-0: #1a1a18;
+                --surface-1: #242422;
+                --surface-2: #2c2c2a;
+                --border: rgba(255, 255, 255, 0.08);
+                --border-strong: rgba(255, 255, 255, 0.15);
+                --bg-danger: #501313;
+                --text-danger: #f09595;
+                --bg-success: #173404;
+                --text-success: #97c459;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--surface-0);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            gap: 8px;
+            padding: 12px;
+        }
+
+        .header {
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .header p {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 13px;
+            border: 0.5px solid var(--border-strong);
+            border-radius: 5px;
+            background-color: var(--surface-2);
+            color: var(--text-primary);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 12px;
+            border: 0.5px solid var(--border-strong);
+            border-radius: 5px;
+            background-color: var(--surface-2);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--surface-1);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .content {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 160px;
+            overflow-y: auto;
+            padding-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .section {
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+
+        .btn-compact {
+            padding: 6px 8px;
+            font-size: 11px;
+            text-align: center;
+            border: 0.5px solid var(--border-strong);
+            border-radius: 4px;
+            background-color: var(--surface-1);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-compact:hover {
+            background-color: var(--surface-2);
+        }
+
+        .results {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .results-scroll {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .passage-card {
+            padding: 8px;
+            background-color: var(--surface-2);
+            border: 0.5px solid var(--border);
+            border-radius: 8px;
+            flex-shrink: 0;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .passage-text {
+            font-style: italic;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .passage-source {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .passage-relevance {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .passage-relevance strong {
+            color: var(--text-primary);
+        }
+
+        .passage-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .passage-btn {
+            padding: 2px 6px;
+            font-size: 10px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .passage-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .passage-btn.favorited {
+            color: #e24b4a;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid var(--text-secondary);
+            border-top-color: var(--text-primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .error {
+            background-color: var(--bg-danger);
+            color: var(--text-danger);
+            border: 0.5px solid var(--text-danger);
+        }
+
+        .success {
+            background-color: var(--bg-success);
+            color: var(--text-success);
+            border: 0.5px solid var(--text-success);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>LOTR Passage Finder</h1>
+            <p>Find Middle-earth wisdom instantly</p>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="quote-input" placeholder="Quote or character…" autocomplete="off">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div class="content">
+            <div class="sidebar">
+                <div class="section">
+                    <div class="section-title">Characters</div>
+                    <div class="button-group">
+                        <button class="btn-compact char-btn" data-character="Gandalf">Gandalf</button>
+                        <button class="btn-compact char-btn" data-character="Frodo">Frodo</button>
+                        <button class="btn-compact char-btn" data-character="Aragorn">Aragorn</button>
+                        <button class="btn-compact char-btn" data-character="Legolas">Legolas</button>
+                        <button class="btn-compact char-btn" data-character="Gimli">Gimli</button>
+                        <button class="btn-compact char-btn" data-character="Sam">Sam</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Themes</div>
+                    <div class="button-group">
+                        <button class="btn-compact theme-btn" data-theme="Courage">Courage</button>
+                        <button class="btn-compact theme-btn" data-theme="Hope">Hope</button>
+                        <button class="btn-compact theme-btn" data-theme="Friendship">Friendship</button>
+                        <button class="btn-compact theme-btn" data-theme="Wisdom">Wisdom</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results">
+                <div id="message-container"></div>
+                <div class="results-scroll">
+                    <div class="empty-state">Enter a quote or pick a character</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quoteInput = document.getElementById('quote-input');
+        const searchBtn = document.getElementById('search-btn');
+        const messageContainer = document.getElementById('message-container');
+        const resultsScroll = document.querySelector('.results-scroll');
+
+        let favorites = JSON.parse(localStorage.getItem('lotrFavorites')) || [];
+
+        searchBtn.addEventListener('click', findPassages);
+        quoteInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') findPassages();
+        });
+
+        document.querySelectorAll('.char-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const character = btn.dataset.character;
+                quoteInput.value = `What would ${character} say?`;
+                findPassages();
+            });
+        });
+
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                quoteInput.value = `Theme: ${theme}`;
+                findPassages();
+            });
+        });
+
+        async function findPassages() {
+            const input = quoteInput.value.trim();
+            if (!input) return;
+
+            searchBtn.disabled = true;
+            messageContainer.innerHTML = '';
+            resultsScroll.innerHTML = '<div class="loading"><span class="spinner"></span>Searching…</div>';
+
+            try {
+                const response = await fetch('/.netlify/functions/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        prompt: `Find 2-3 relevant LOTR passages related to: "${input}"\n\nReturn ONLY JSON: {"passages": [{"text": "...", "source": "Book, Chapter", "relevance": "..."}]}`
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    showError('Search failed: ' + (data.error || 'Unknown error'));
+                    return;
+                }
+
+                if (!data.content?.[0]?.text) {
+                    showError('No response from API');
+                    return;
+                }
+
+                const cleanJson = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+                const parsed = JSON.parse(cleanJson);
+
+                if (!parsed.passages?.length) {
+                    showError('No passages found');
+                    return;
+                }
+
+                displayPassages(parsed.passages);
+            } catch (err) {
+                console.error(err);
+                showError('Error: ' + err.message);
+            } finally {
+                searchBtn.disabled = false;
+            }
+        }
+
+        function displayPassages(passages) {
+            const fragment = document.createDocumentFragment();
+
+            passages.forEach(passage => {
+                const card = document.createElement('div');
+                card.className = 'passage-card';
+                card.innerHTML = `
+                    <div class="passage-text">"${passage.text}"</div>
+                    <div class="passage-source">— ${passage.source}</div>
+                    <div class="passage-relevance"><strong>Why:</strong> ${passage.relevance}</div>
+                    <div class="passage-actions">
+                        <button class="passage-btn copy-btn" title="Copy">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="passage-btn art-btn" title="Find art">
+                            <i class="fas fa-image"></i>
+                        </button>
+                    </div>
+                `;
+
+                card.querySelector('.copy-btn').addEventListener('click', () => {
+                    navigator.clipboard.writeText(`"${passage.text}" — ${passage.source}`);
+                    showSuccess('Copied!');
+                });
+
+                card.querySelector('.art-btn').addEventListener('click', () => {
+                    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(passage.source + ' art John Howe Alan Lee -ai -midjourney')}&tbm=isch`;
+                    window.open(searchUrl, '_blank');
+                });
+
+                fragment.appendChild(card);
+            });
+
+            resultsScroll.innerHTML = '';
+            resultsScroll.appendChild(fragment);
+        }
+
+        function showError(msg) {
+            messageContainer.innerHTML = `<div class="message error">${msg}</div>`;
+            resultsScroll.innerHTML = '';
+        }
+
+        function showSuccess(msg) {
+            messageContainer.innerHTML = `<div class="message success">${msg}</div>`;
+            setTimeout(() => messageContainer.innerHTML = '', 1500);
+        }
+    </script>
+</body>
+</html>
