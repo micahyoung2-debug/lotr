@@ -5,50 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOTR Passage Finder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            --text-primary: #2c2c2a;
-            --text-secondary: #5f5e5a;
-            --text-muted: #888780;
-            --surface-0: #f1efe8;
-            --surface-1: #ede9e0;
-            --surface-2: #ffffff;
-            --border: rgba(0, 0, 0, 0.08);
-            --border-strong: rgba(0, 0, 0, 0.15);
-            --bg-danger: #fcebeb;
-            --text-danger: #a32d2d;
-            --bg-success: #eaf3de;
-            --text-success: #3b6d11;
+            --text-primary: #3d2817;
+            --text-secondary: #6b5d4f;
+            --text-muted: #8b7d6f;
+            --surface-0: #e8dcc8;
+            --surface-1: #d4c4a8;
+            --surface-2: #f5f0e6;
+            --border: rgba(61, 40, 23, 0.1);
+            --border-strong: rgba(61, 40, 23, 0.25);
+            --bg-danger: #f5e6e6;
+            --text-danger: #8b3a3a;
+            --bg-success: #e8f0e0;
+            --text-success: #3d6b2e;
+            --accent-gold: #b8860b;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --text-primary: #f0ede6;
-                --text-secondary: #a09d94;
-                --text-muted: #6d6c68;
-                --surface-0: #1a1a18;
-                --surface-1: #242422;
-                --surface-2: #2c2c2a;
-                --border: rgba(255, 255, 255, 0.08);
-                --border-strong: rgba(255, 255, 255, 0.15);
-                --bg-danger: #501313;
-                --text-danger: #f09595;
-                --bg-success: #173404;
-                --text-success: #97c459;
+                --text-primary: #e8dcc8;
+                --text-secondary: #c4a880;
+                --text-muted: #9d8b75;
+                --surface-0: #2a1f15;
+                --surface-1: #3d2d20;
+                --surface-2: #4a3828;
+                --border: rgba(232, 220, 200, 0.1);
+                --border-strong: rgba(232, 220, 200, 0.25);
+                --bg-danger: #4a2a2a;
+                --text-danger: #e09b9b;
+                --bg-success: #2a3d20;
+                --text-success: #a8d989;
+                --accent-gold: #d4af37;
             }
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: 'Crimson Text', Georgia, serif;
             background-color: var(--surface-0);
             color: var(--text-primary);
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 30% 50%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(61, 40, 23, 0.03) 2px, rgba(61, 40, 23, 0.03) 4px);
+            background-attachment: fixed;
         }
 
         .app {
@@ -57,29 +61,36 @@
             height: 100vh;
             gap: 8px;
             padding: 12px;
+            border: 2px solid var(--accent-gold);
+            box-shadow: inset 0 0 20px rgba(184, 134, 11, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
             line-height: 1.2;
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .header h1 {
-            font-size: 20px;
-            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 2px;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
         }
 
         .header p {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
+            font-style: italic;
         }
 
-        .search-bar {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-        }
+        .search-bar { display: flex; gap: 6px; flex-shrink: 0; }
 
         input[type="text"] {
             flex: 1;
@@ -89,10 +100,6 @@
             border-radius: 5px;
             background-color: var(--surface-2);
             color: var(--text-primary);
-        }
-
-        input[type="text"]::placeholder {
-            color: var(--text-muted);
         }
 
         button {
@@ -107,51 +114,33 @@
             white-space: nowrap;
         }
 
-        button:hover:not(:disabled) {
-            background-color: var(--surface-1);
-        }
+        button:hover:not(:disabled) { background-color: var(--surface-1); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .content { display: flex; gap: 8px; flex: 1; min-height: 0; overflow: hidden; }
 
-        .content {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
+        .sidebar { width: 160px; overflow-y: auto; padding-right: 8px; flex-shrink: 0; }
 
-        .sidebar {
-            width: 160px;
-            overflow-y: auto;
-            padding-right: 8px;
-            flex-shrink: 0;
-        }
-
-        .section {
-            margin-bottom: 10px;
-        }
+        .section { margin-bottom: 10px; }
 
         .section-title {
-            font-size: 10px;
-            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            font-weight: 700;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: var(--accent-gold);
             margin-bottom: 4px;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .button-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-        }
+        .button-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+        .section.single-column .button-group { grid-template-columns: 1fr; }
 
-        .section.single-column .button-group {
-            grid-template-columns: 1fr;
+        .button-group.scroll-8 {
+            max-height: 128px;
+            overflow-y: auto;
+            padding-right: 3px;
+            align-content: start;
         }
 
         .btn-compact {
@@ -166,9 +155,7 @@
             transition: all 0.15s;
         }
 
-        .btn-compact:hover {
-            background-color: var(--surface-2);
-        }
+        .btn-compact:hover { background-color: var(--surface-2); }
 
         .toggle-btn {
             padding: 5px 8px;
@@ -187,11 +174,7 @@
             border-color: var(--text-primary);
         }
 
-        .toggle-group {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
+        .toggle-group { display: flex; flex-direction: column; gap: 3px; }
 
         .collapsible {
             cursor: pointer;
@@ -206,24 +189,11 @@
             letter-spacing: 0.5px;
         }
 
-        .collapsible i {
-            font-size: 8px;
-            transition: transform 0.2s;
-        }
+        .collapsible i { font-size: 8px; transition: transform 0.2s; }
+        .collapsible.collapsed i { transform: rotate(-90deg); }
 
-        .collapsible.collapsed i {
-            transform: rotate(-90deg);
-        }
-
-        .collapsible-content {
-            max-height: 500px;
-            overflow: hidden;
-            transition: max-height 0.2s;
-        }
-
-        .collapsible.collapsed .collapsible-content {
-            max-height: 0;
-        }
+        .collapsible-content { max-height: 500px; overflow: hidden; transition: max-height 0.2s; }
+        .collapsible.collapsed .collapsible-content { max-height: 0; }
 
         .results {
             flex: 1;
@@ -231,70 +201,69 @@
             flex-direction: column;
             min-width: 0;
             overflow: hidden;
+            position: relative;
         }
 
-        .results-scroll {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
+        .results::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 320px;
+            background: url('monogram.png') no-repeat center;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.08;
         }
+
+        .results-scroll, #message-container, #favorites-container {
+            position: relative;
+            z-index: 1;
+        }
+        .results-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; align-items: stretch; }
 
         .passage-card {
-            padding: 8px;
+            padding: 10px;
             background-color: var(--surface-2);
-            border: 0.5px solid var(--border);
-            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 2px;
             flex-shrink: 0;
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 13px;
+            line-height: 1.6;
+            box-shadow: 0 2px 4px rgba(61, 40, 23, 0.1);
         }
 
-        .passage-text {
-            font-style: italic;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
+        .passage-text { font-style: italic; color: var(--text-primary); margin-bottom: 6px; font-size: 12px; }
+        .passage-source { font-family: 'Cinzel', serif; font-size: 10px; color: var(--accent-gold); margin-bottom: 6px; font-weight: 600; }
+        .passage-relevance { font-size: 11px; color: var(--text-secondary); }
+        .passage-relevance strong { color: var(--text-primary); }
 
-        .passage-source {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .passage-relevance {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .passage-relevance strong {
-            color: var(--text-primary);
-        }
-
-        .passage-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 4px;
-        }
+        .passage-actions { display: flex; gap: 8px; margin-top: 4px; }
 
         .passage-btn {
-            padding: 2px 6px;
+            padding: 4px 8px;
             font-size: 10px;
-            background: none;
-            border: none;
+            background: var(--surface-1);
+            border: 0.5px solid var(--border-strong);
             color: var(--text-secondary);
             cursor: pointer;
-            transition: color 0.15s;
+            transition: all 0.15s;
+            border-radius: 3px;
         }
 
         .passage-btn:hover {
-            color: var(--text-primary);
+            background: var(--accent-gold);
+            color: white;
+            border-color: var(--accent-gold);
         }
 
         .passage-btn.favorited {
-            color: #e24b4a;
+            color: #c85a5a;
+            background: rgba(200, 90, 90, 0.1);
         }
 
         .empty-state {
@@ -303,112 +272,56 @@
             font-size: 12px;
             padding: 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
+            position: relative;
+            flex: 1;
+            height: 100%;
+            width: 100%;
         }
 
-        .loading {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+        .empty-state::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 320px;
+            background: url('monogram.png') no-repeat center;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
         }
 
-        .spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 1.5px solid var(--text-secondary);
-            border-top-color: var(--text-primary);
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+        .empty-state > * {
+            position: relative;
+            z-index: 1;
         }
+        .loading { text-align: center; color: var(--text-secondary); font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .spinner { display: inline-block; width: 12px; height: 12px; border: 1.5px solid var(--text-secondary); border-top-color: var(--text-primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 
-        .message {
-            padding: 8px;
-            border-radius: 5px;
-            font-size: 11px;
-            margin-bottom: 4px;
-            text-align: center;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .error {
-            background-color: var(--bg-danger);
-            color: var(--text-danger);
-            border: 0.5px solid var(--text-danger);
-        }
+        .message { padding: 8px; border-radius: 5px; font-size: 11px; margin-bottom: 4px; text-align: center; }
+        .error { background-color: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--text-danger); }
+        .success { background-color: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--text-success); }
 
-        .success {
-            background-color: var(--bg-success);
-            color: var(--text-success);
-            border: 0.5px solid var(--text-success);
-        }
+        .favorites-mini { padding: 8px; background-color: var(--surface-1); border: 0.5px solid var(--border); border-radius: 8px; font-size: 10px; flex-shrink: 0; max-height: 80px; overflow-y: auto; }
+        .favorites-mini-title { font-weight: 600; font-size: 9px; margin-bottom: 4px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .favorite-item-mini { padding: 3px 0; border-bottom: 0.5px solid var(--border); font-size: 10px; }
+        .favorite-item-mini:last-child { border-bottom: none; }
+        .favorite-text-mini { font-style: italic; font-size: 9px; color: var(--text-primary); margin-bottom: 1px; }
+        .favorite-source-mini { font-size: 8px; color: var(--text-muted); }
 
-        .favorites-mini {
-            padding: 8px;
-            background-color: var(--surface-1);
-            border: 0.5px solid var(--border);
-            border-radius: 8px;
-            font-size: 10px;
-            flex-shrink: 0;
-            max-height: 80px;
-            overflow-y: auto;
-        }
-
-        .favorites-mini-title {
-            font-weight: 600;
-            font-size: 9px;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .favorite-item-mini {
-            padding: 3px 0;
-            border-bottom: 0.5px solid var(--border);
-            font-size: 10px;
-        }
-
-        .favorite-item-mini:last-child {
-            border-bottom: none;
-        }
-
-        .favorite-text-mini {
-            font-style: italic;
-            font-size: 9px;
-            color: var(--text-primary);
-            margin-bottom: 1px;
-        }
-
-        .favorite-source-mini {
-            font-size: 8px;
-            color: var(--text-muted);
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-strong);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -442,7 +355,7 @@
 
                 <div class="section">
                     <div class="section-title">Characters</div>
-                    <div class="button-group">
+                    <div class="button-group scroll-8">
                         <button class="btn-compact char-btn" data-character="Gandalf">Gandalf</button>
                         <button class="btn-compact char-btn" data-character="Frodo">Frodo</button>
                         <button class="btn-compact char-btn" data-character="Aragorn">Aragorn</button>
@@ -451,18 +364,52 @@
                         <button class="btn-compact char-btn" data-character="Gollum">Gollum</button>
                         <button class="btn-compact char-btn" data-character="Boromir">Boromir</button>
                         <button class="btn-compact char-btn" data-character="Sam">Sam</button>
+                        <button class="btn-compact char-btn" data-character="Bilbo">Bilbo</button>
+                        <button class="btn-compact char-btn" data-character="Merry">Merry</button>
+                        <button class="btn-compact char-btn" data-character="Pippin">Pippin</button>
+                        <button class="btn-compact char-btn" data-character="Theoden">Théoden</button>
+                        <button class="btn-compact char-btn" data-character="Eowyn">Éowyn</button>
+                        <button class="btn-compact char-btn" data-character="Eomer">Éomer</button>
+                        <button class="btn-compact char-btn" data-character="Faramir">Faramir</button>
+                        <button class="btn-compact char-btn" data-character="Denethor">Denethor</button>
+                        <button class="btn-compact char-btn" data-character="Elrond">Elrond</button>
+                        <button class="btn-compact char-btn" data-character="Arwen">Arwen</button>
+                        <button class="btn-compact char-btn" data-character="Galadriel">Galadriel</button>
+                        <button class="btn-compact char-btn" data-character="Celeborn">Celeborn</button>
+                        <button class="btn-compact char-btn" data-character="Saruman">Saruman</button>
+                        <button class="btn-compact char-btn" data-character="Sauron">Sauron</button>
+                        <button class="btn-compact char-btn" data-character="Treebeard">Treebeard</button>
+                        <button class="btn-compact char-btn" data-character="Bombadil">Tom Bombadil</button>
+                        <button class="btn-compact char-btn" data-character="Wormtongue">Wormtongue</button>
+                        <button class="btn-compact char-btn" data-character="Shelob">Shelob</button>
+                        <button class="btn-compact char-btn" data-character="Witch-king">Witch-king</button>
+                        <button class="btn-compact char-btn" data-character="Glorfindel">Glorfindel</button>
+                        <button class="btn-compact char-btn" data-character="Bard">Bard</button>
+                        <button class="btn-compact char-btn" data-character="Thranduil">Thranduil</button>
                     </div>
                 </div>
 
                 <div class="section">
                     <div class="section-title">Themes</div>
-                    <div class="button-group">
+                    <div class="button-group scroll-8">
                         <button class="btn-compact theme-btn" data-theme="Courage">Courage</button>
                         <button class="btn-compact theme-btn" data-theme="Hope">Hope</button>
                         <button class="btn-compact theme-btn" data-theme="Friendship">Friendship</button>
                         <button class="btn-compact theme-btn" data-theme="Sacrifice">Sacrifice</button>
                         <button class="btn-compact theme-btn" data-theme="Wisdom">Wisdom</button>
                         <button class="btn-compact theme-btn" data-theme="Power">Power</button>
+                        <button class="btn-compact theme-btn" data-theme="Loyalty">Loyalty</button>
+                        <button class="btn-compact theme-btn" data-theme="Fear">Fear</button>
+                        <button class="btn-compact theme-btn" data-theme="Redemption">Redemption</button>
+                        <button class="btn-compact theme-btn" data-theme="Death">Death</button>
+                        <button class="btn-compact theme-btn" data-theme="Home">Home</button>
+                        <button class="btn-compact theme-btn" data-theme="Temptation">Temptation</button>
+                        <button class="btn-compact theme-btn" data-theme="Leadership">Leadership</button>
+                        <button class="btn-compact theme-btn" data-theme="Loss">Loss</button>
+                        <button class="btn-compact theme-btn" data-theme="Greed">Greed</button>
+                        <button class="btn-compact theme-btn" data-theme="Mercy">Mercy</button>
+                        <button class="btn-compact theme-btn" data-theme="War">War</button>
+                        <button class="btn-compact theme-btn" data-theme="Nature">Nature</button>
                     </div>
                 </div>
 
@@ -526,23 +473,12 @@
         const favoritesContainer = document.getElementById('favorites-container');
         const collapsible = document.querySelector('.collapsible');
 
-        let currentFilters = {
-            quoteType: null,
-            books: [],
-            passageType: 'all',
-            length: null
-        };
-
+        let currentFilters = { quoteType: null, books: [], passageType: 'all', length: null };
         let favorites = JSON.parse(localStorage.getItem('lotrFavorites')) || [];
 
-        collapsible.addEventListener('click', () => {
-            collapsible.classList.toggle('collapsed');
-        });
-
+        collapsible.addEventListener('click', () => collapsible.classList.toggle('collapsed'));
         searchBtn.addEventListener('click', findPassages);
-        quoteInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') findPassages();
-        });
+        quoteInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') findPassages(); });
         randomBtn.addEventListener('click', getRandomPassage);
 
         document.querySelectorAll('.race-btn').forEach(btn => {
@@ -583,9 +519,7 @@
             btn.addEventListener('click', () => {
                 btn.classList.toggle('active');
                 const book = btn.dataset.book;
-                currentFilters.books = btn.classList.contains('active') 
-                    ? [...currentFilters.books, book]
-                    : currentFilters.books.filter(b => b !== book);
+                currentFilters.books = btn.classList.contains('active') ? [...currentFilters.books, book] : currentFilters.books.filter(b => b !== book);
             });
         });
 
@@ -608,111 +542,99 @@
         function buildPrompt(input) {
             const characterMatch = input.match(/^\[(\w+)\]\s*(.*)/);
             const themeMatch = input.match(/^Theme:\s*(.+)/);
-            
-            let specialContext = '';
-            let queryInput = input;
-
-            if (themeMatch) {
-                specialContext = `Theme requested: ${themeMatch[1]}. `;
-                queryInput = themeMatch[1];
-            } else if (characterMatch) {
-                specialContext = `Character requested: ${characterMatch[1]}. `;
-                queryInput = characterMatch[2] || `wisdom from ${characterMatch[1]}`;
-            }
-
+            let specialContext = '', queryInput = input;
+            if (themeMatch) { specialContext = `Theme requested: ${themeMatch[1]}. `; queryInput = themeMatch[1]; }
+            else if (characterMatch) { specialContext = `Character requested: ${characterMatch[1]}. `; queryInput = characterMatch[2] || `wisdom from ${characterMatch[1]}`; }
             let filterHints = '';
             if (currentFilters.quoteType === 'popular') filterHints += ' Prioritize iconic quotes.';
             else if (currentFilters.quoteType === 'hidden') filterHints += ' Prioritize lesser-known passages.';
-
             if (currentFilters.books.length > 0) {
-                const bookNames = currentFilters.books.map(b => 
-                    b === 'Fellowship' ? 'Fellowship' : b === 'TwoTowers' ? 'Two Towers' : 'Return of King'
-                ).join(', ');
+                const bookNames = currentFilters.books.map(b => b === 'Fellowship' ? 'Fellowship' : b === 'TwoTowers' ? 'Two Towers' : 'Return of King').join(', ');
                 filterHints += ` Prioritize: ${bookNames}.`;
             }
-
             if (currentFilters.passageType === 'dialogue') filterHints += ' Dialogue only.';
             if (currentFilters.length === 'short') filterHints += ' Keep short.';
             else if (currentFilters.length === 'long') filterHints += ' Include longer passages.';
+            return `${specialContext}Find 10 relevant passages from LOTR: "${queryInput}"${filterHints}
 
-            return `${specialContext}Find 2-3 relevant passages from LOTR: "${queryInput}"${filterHints}
-
-Return a valid JSON object with this exact structure. Escape all quotes in strings with backslash.
+CRITICAL: Return ONLY valid JSON. Use backslash to escape ALL quotation marks inside strings.
+Format:
 {
   "passages": [
-    {"text": "exact passage quote", "source": "Book Name, Chapter Number", "relevance": "brief explanation"}
+    {"text": "passage text here - escape inner \\"quotes\\" like this", "source": "Book, Chapter", "relevance": "explanation"}
   ]
 }
 
-Return ONLY the JSON, no other text.`;
+Return ONLY the JSON object, no other text or markdown.`;
         }
 
         async function findPassages() {
             const input = quoteInput.value.trim();
             if (!input) return;
-
             searchBtn.disabled = true;
             messageContainer.innerHTML = '';
             resultsScroll.innerHTML = '<div class="loading"><span class="spinner"></span>Searching…</div>';
-
             try {
-                const response = await fetch('/api/search', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        prompt: buildPrompt(input)
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    showError('API Error: ' + (data.error?.message || 'Unknown error'));
+                const response = await fetch('/api/search', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: buildPrompt(input)}) });
+                
+                const rawText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (e) {
+                    console.error('Response was not valid JSON. Raw response:', rawText);
+                    showError('Server returned invalid response. Check console for details.');
                     return;
                 }
-
-                if (!data.content?.[0]?.text) {
-                    showError('No response from API');
-                    return;
-                }
-
-                const cleanJson = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+                
+                if (!response.ok) { showError('API Error: ' + (data.error?.message || 'Unknown error')); return; }
+                if (!data.content?.[0]?.text) { showError('No response from API'); return; }
+                
+                let text = data.content[0].text.trim();
+                text = text.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim();
                 
                 let parsed;
+                
+                // Try direct parse first
                 try {
-                    parsed = JSON.parse(cleanJson);
-                } catch (parseErr) {
-                    console.error('JSON parse error:', parseErr);
-                    console.error('Raw response:', cleanJson);
-                    showError('Failed to parse response. Please try again.');
-                    return;
+                    parsed = JSON.parse(text);
+                    if (parsed.passages?.length) { displayPassages(parsed.passages); return; }
+                } catch (e) {
+                    // Try fixing unescaped quotes inside field values
+                    try {
+                        // This regex finds unescaped quotes and escapes them
+                        let fixed = text.replace(/: "([^"]*)"(?=")/g, (match) => {
+                            // Don't double-escape already escaped quotes
+                            return match.replace(/([^\\])"/g, '$1\\"');
+                        });
+                        parsed = JSON.parse(fixed);
+                        if (parsed.passages?.length) { displayPassages(parsed.passages); return; }
+                    } catch (e2) { /* continue */ }
                 }
-
-                if (!parsed.passages?.length) {
-                    showError('No passages found');
-                    return;
+                
+                // Try to find { "passages": [ ... ] } pattern
+                const match = text.match(/\{[^{}]*"passages"\s*:\s*\[[^\[\]]*\{[^{}]*\}[^\[\]]*\][^{}]*\}/);
+                if (match) {
+                    try {
+                        parsed = JSON.parse(match[0]);
+                        if (parsed.passages?.length) { displayPassages(parsed.passages); return; }
+                    } catch (e) { /* continue */ }
                 }
-
-                displayPassages(parsed.passages);
-            } catch (err) {
-                console.error(err);
-                showError('Error: ' + err.message);
-            } finally {
-                searchBtn.disabled = false;
+                
+                showError('Could not parse passages. Try a different search.');
+            } catch (err) { 
+                console.error(err); 
+                showError('Error: ' + err.message); 
             }
+            finally { searchBtn.disabled = false; }
         }
 
-        async function getRandomPassage() {
-            quoteInput.value = 'Random wisdom from Middle-earth';
-            await findPassages();
-        }
+        async function getRandomPassage() { quoteInput.value = 'Random wisdom from Middle-earth'; await findPassages(); }
 
         function displayPassages(passages) {
             const fragment = document.createDocumentFragment();
-
             passages.forEach(passage => {
                 const isFavorited = favorites.some(fav => fav.text === passage.text);
-                
                 const card = document.createElement('div');
                 card.className = 'passage-card';
                 card.innerHTML = `
@@ -720,80 +642,42 @@ Return ONLY the JSON, no other text.`;
                     <div class="passage-source">— ${passage.source}</div>
                     <div class="passage-relevance"><strong>Why:</strong> ${passage.relevance}</div>
                     <div class="passage-actions">
-                        <button class="passage-btn copy-btn" title="Copy">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                        <button class="passage-btn art-btn" title="Find art">
-                            <i class="fas fa-image"></i>
-                        </button>
-                        <button class="passage-btn favorite-btn ${isFavorited ? 'favorited' : ''}" title="Save">
-                            <i class="fas fa-heart"></i>
-                        </button>
+                        <button class="passage-btn copy-btn" title="Copy to clipboard"><i class="fas fa-copy"></i> Copy</button>
+                        <button class="passage-btn art-btn" title="Find art of this scene"><i class="fas fa-image"></i> Art</button>
+                        <button class="passage-btn favorite-btn ${isFavorited ? 'favorited' : ''}" title="Save to favorites"><i class="fas fa-heart"></i></button>
                     </div>
                 `;
-
                 card.querySelector('.copy-btn').addEventListener('click', () => {
                     navigator.clipboard.writeText(`"${passage.text}" — ${passage.source}`);
                     showSuccess('Copied!');
                 });
-
                 card.querySelector('.art-btn').addEventListener('click', () => {
                     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(passage.source + ' art John Howe Alan Lee -ai -midjourney')}&tbm=isch`;
                     window.open(searchUrl, '_blank');
                 });
-
-                card.querySelector('.favorite-btn').addEventListener('click', function() {
-                    toggleFavorite(passage);
-                    this.classList.toggle('favorited');
-                });
-
+                card.querySelector('.favorite-btn').addEventListener('click', function() { toggleFavorite(passage); this.classList.toggle('favorited'); });
                 fragment.appendChild(card);
             });
-
             resultsScroll.innerHTML = '';
             resultsScroll.appendChild(fragment);
             updateFavoritesDisplay();
         }
 
-        function toggleFavorite(passage) {
-            const idx = favorites.findIndex(fav => fav.text === passage.text);
-            if (idx > -1) favorites.splice(idx, 1);
-            else favorites.push(passage);
-            localStorage.setItem('lotrFavorites', JSON.stringify(favorites));
-            updateFavoritesDisplay();
-        }
+        function toggleFavorite(passage) { const idx = favorites.findIndex(fav => fav.text === passage.text); idx > -1 ? favorites.splice(idx, 1) : favorites.push(passage); localStorage.setItem('lotrFavorites', JSON.stringify(favorites)); updateFavoritesDisplay(); }
 
         function updateFavoritesDisplay() {
-            if (favorites.length === 0) {
-                favoritesContainer.innerHTML = '';
-                return;
-            }
-
-            let html = `<div class="favorites-mini">
-                <div class="favorites-mini-title">❤️ Saved (${favorites.length})</div>`;
-
-            favorites.forEach(fav => {
-                html += `<div class="favorite-item-mini">
-                    <div class="favorite-text-mini">"${fav.text}"</div>
-                    <div class="favorite-source-mini">${fav.source}</div>
-                </div>`;
-            });
-
+            if (favorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            let html = `<div class="favorites-mini"><div class="favorites-mini-title">❤️ Saved (${favorites.length})</div>`;
+            favorites.forEach(fav => { html += `<div class="favorite-item-mini"><div class="favorite-text-mini">"${fav.text}"</div><div class="favorite-source-mini">${fav.source}</div></div>`; });
             html += '</div>';
             favoritesContainer.innerHTML = html;
         }
 
-        function showError(msg) {
-            messageContainer.innerHTML = `<div class="message error">${msg}</div>`;
-            resultsScroll.innerHTML = '';
-        }
-
-        function showSuccess(msg) {
-            messageContainer.innerHTML = `<div class="message success">${msg}</div>`;
-            setTimeout(() => messageContainer.innerHTML = '', 1500);
-        }
+        function showError(msg) { messageContainer.innerHTML = `<div class="message error">${msg}</div>`; resultsScroll.innerHTML = ''; }
+        function showSuccess(msg) { messageContainer.innerHTML = `<div class="message success">${msg}</div>`; setTimeout(() => messageContainer.innerHTML = '', 1500); }
 
         updateFavoritesDisplay();
     </script>
 </body>
 </html>
+
